@@ -9,7 +9,7 @@ npm install sequelize sequelize-cli
 touch .sequelizerc
 
 Indsæt dette i .sequelizerc
-
+```javascript
 const path = require('path')
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
   'seeders-path': path.resolve('./database/seeders'),
   'migrations-path': path.resolve('./database/migrations'),
 }
-
+```
 
 btw .sequelizerc skal ikke være .js den skal bare lades være udefineret er ok
 
@@ -27,7 +27,7 @@ lav en holder der hedder database
 npx sequelize init
 
 gå til database/config/config.js og indsæt: (gå til kitematic og gør en mariadb docker og sæt password og se port)
-
+```javascript
 require('dotenv').config()
 
 module.exports = {
@@ -40,7 +40,7 @@ module.exports = {
     "dialect": "mysql"
   }
 }
-
+```
 npm install dotenv
 
 
@@ -61,14 +61,15 @@ Hver kommando laver en migration og en model fil til hver linje.
 Nu i migrations skal vi sørger for at i vores foreign keys skal vi tilføje NOT NULL eller problemer!
 
 FX: 
+```javascript
 userId: {
         allowNull: false,
-
+```
 
 Nu skal vi sørger for at forholdene mellem modellerne passer skal de beskrives fx 1 til mange forhold 
 
 Rediger user model til dette: 
-
+```javascript
 'use strict';
 const {
   Model
@@ -95,9 +96,9 @@ module.exports = (sequelize, DataTypes) => {
   };
   return User;
 };
-
+```
 Rediger post til dette:
-
+```javascript
 'use strict';
 const {
   Model
@@ -124,9 +125,9 @@ module.exports = (sequelize, DataTypes) => {
   };
   return Post;
 };
-
+```
 Comment til dette:
-
+```javascript
 'use strict';
 const {
   Model
@@ -150,7 +151,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   return Comment;
 };
-
+```
 
 Nu kan vi kører vores migrations, som laver i dette tilfælde oprette tabeller
 
@@ -169,7 +170,7 @@ npx sequelize seed:generate --name Comment
 
 
 Indsæt til user:
-
+```javascript
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.bulkInsert(
     'Users',
@@ -192,10 +193,10 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => queryInterface.bulkDelete('Users', null, {}),
 };
-
+```
 
 Indsæt til post:
-
+```javascript
 module.exports = {
   up: (queryInterface, Sequelize) =>
     queryInterface.bulkInsert(
@@ -225,10 +226,10 @@ module.exports = {
   down: (queryInterface, Sequelize) =>
     queryInterface.bulkDelete("Posts", null, {})
 };
-
+```
 
 Indsæt til comment:
-
+```javascript
 module.exports = {
   up: (queryInterface, Sequelize) =>
     queryInterface.bulkInsert(
@@ -257,7 +258,7 @@ module.exports = {
   down: (queryInterface, Sequelize) =>
     queryInterface.bulkDelete("Comments", null, {})
 };
-
+```
 npx sequelize db:seed:all
 
 
@@ -279,7 +280,7 @@ mkdir controllers && touch controllers/index.js
 
 
 Put det her i controllers/index.js:
-
+```javascript
 const models = require('../database/models');
 
 const createPost = async (req, res) => {
@@ -296,10 +297,10 @@ const createPost = async (req, res) => {
 module.exports = {
   createPost,
 }
-
+```
 
 Rediger nu din router fil, så den har dette: 
-
+```javascript
 const { Router } = require('express');
 const controllers = require('../controllers');
 
@@ -310,24 +311,24 @@ router.get('/', (req, res) => res.send('Welcome'))
 router.post('/posts', controllers.createPost);
 
 module.exports = router;
-
+```
 
 
 Åbn postman og lav en postrequest til: localhost:3000/posts med dette body:
-
+```javascript
 {
     "userId": 1,
     "title": "postman hello",
     "content": "bro!"
 }
-
+```
 Du bør så få en response og der bør ligge noget nyt i databasen.
 
 
 Nu laver vi getter
 
 tilføj dette til controller/index.js:
-
+```javascript
 const getAllPosts = async (req, res) => {
     try {
       const posts = await models.Post.findAll({
@@ -351,10 +352,10 @@ const getAllPosts = async (req, res) => {
 module.exports = {
   createPost,getAllPosts
 }
-
+```
 Og dette til routeren:
-
+```javascript
 router.get('/posts', controllers.getAllPosts);
-
+```
 
 Hvis du vil lave resten, så se under del2 afsnittet. der ligger mere CRUD!

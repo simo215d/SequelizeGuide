@@ -159,7 +159,7 @@ npx sequelize db:migrate
 
 Hvis dette sker: ERROR: Invalid shorthand property initializer så har du måske skrevet = ok ikke :
 
-#Seed
+# Seed
 Vi kan lave seeds for at fylde noget dummy data til tabellerne
 
 npx sequelize seed:generate --name User

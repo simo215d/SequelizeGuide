@@ -154,3 +154,108 @@ Nu kan vi kører vores migrations, som laver i dette tilfælde oprette tabeller
 npx sequelize db:migrate
 
 Hvis dette sker: ERROR: Invalid shorthand property initializer så har du måske skrevet = ok ikke :
+
+#Seed
+Vi kan lave seeds for at fylde noget dummy data til tabellerne
+
+npx sequelize seed:generate --name User
+
+npx sequelize seed:generate --name Post
+
+npx sequelize seed:generate --name Comment
+
+
+Indsæt til user:
+
+module.exports = {
+  up: (queryInterface, Sequelize) => queryInterface.bulkInsert(
+    'Users',
+    [
+      {
+        name: 'Jane Doe',
+        email: 'janedoe@example.com',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Jon Doe',
+        email: 'jondoe@example.com',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ],
+    {},
+  ),
+
+  down: (queryInterface, Sequelize) => queryInterface.bulkDelete('Users', null, {}),
+};
+
+
+Indsæt til post:
+
+module.exports = {
+  up: (queryInterface, Sequelize) =>
+    queryInterface.bulkInsert(
+      "Posts",
+      [
+        {
+          userId: 1,
+          title: "hispotan de nu",
+          content:
+            "Nulla mollis molestie lorem. Quisque ut erat. Curabitur gravida nisi at nibh.",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        { 
+          userId: 2,
+          title: 'some dummy title',
+          content:
+            "Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat.",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ],
+
+      {}
+    ),
+
+  down: (queryInterface, Sequelize) =>
+    queryInterface.bulkDelete("Posts", null, {})
+};
+
+
+Indsæt til comment:
+
+module.exports = {
+  up: (queryInterface, Sequelize) =>
+    queryInterface.bulkInsert(
+      "Comments",
+      [
+        {
+          userId: 1,
+          postId: 2,
+          comment:
+            "Nulla mollis molestie lorem. Quisque ut erat. Curabitur gravida nisi at nibh.",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          userId: 2,
+          postId: 1,
+          comment:
+            "Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat.",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ],
+      {}
+    ),
+
+  down: (queryInterface, Sequelize) =>
+    queryInterface.bulkDelete("Comments", null, {})
+};
+
+npx sequelize db:seed:all
+
+
+Og nu er der data i databasen!

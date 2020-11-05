@@ -1,6 +1,7 @@
 # Guide
-# her er hans github btw: https://github.com/nedssoft/sequelize-with-postgres-tutorial
 # Del 1. Opsæt database med sequelize
+### her er hans github btw: https://github.com/nedssoft/sequelize-with-postgres-tutorial
+
 Tutorial: https://dev.to/nedsoft/getting-started-with-sequelize-and-postgres-emp
 
 npm install sequelize sequelize-cli

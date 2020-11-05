@@ -1,0 +1,156 @@
+# Guide
+Tutorial: https://dev.to/nedsoft/getting-started-with-sequelize-and-postgres-emp
+
+npm install sequelize sequelize-cli
+
+touch .sequelizerc
+
+Indsæt dette i .sequelizerc
+
+const path = require('path')
+
+module.exports = {
+  config: path.resolve('./database/config', 'config.js'),
+  'models-path': path.resolve('./database/models'),
+  'seeders-path': path.resolve('./database/seeders'),
+  'migrations-path': path.resolve('./database/migrations'),
+}
+
+
+btw .sequelizerc skal ikke være .js den skal bare lades være udefineret er ok
+
+lav en holder der hedder database
+
+npx sequelize init
+
+gå til database/config/config.js og indsæt: (gå til kitematic og gør en mariadb docker og sæt password og se port)
+
+require('dotenv').config()
+
+module.exports = {
+  "development": {
+    "username": "root",
+    "password": "secretbrah",
+    "database": "db1",
+    "host": "127.0.0.1",
+    "port": 32773,
+    "dialect": "mysql"
+  }
+}
+
+npm install dotenv
+
+
+Husk at du kan forbinde med datagrip til mariadb. Der skal du test connection så skal du lave en database db1 så det matcher med din config fil
+
+Nu kan vi lave en tabel til users, posts og comments. 
+
+
+npx sequelize model:generate --name User --attributes name:string,email:string
+
+npx sequelize model:generate --name Post --attributes title:string,content:text,userId:integer
+
+npx sequelize model:generate --name Comment --attributes postId:integer,comment:text,userId:integer
+
+
+Hver kommando laver en migration og en model fil til hver linje.
+
+Nu i migrations skal vi sørger for at i vores foreign keys skal vi tilføje NOT NULL eller problemer!
+
+FX: 
+userId: {
+        allowNull: false,
+
+
+Nu skal vi sørger for at forholdene mellem modellerne passer skal de beskrives fx 1 til mange forhold 
+
+Rediger user model til dette: 
+
+'use strict';
+const {
+  Model
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define('User', {
+    name: DataTypes.STRING,
+    email: DataTypes.STRING
+  }, {});
+  User.associate = function(models) {
+    // associations can be defined here
+    User.hasMany(models.Post, {
+      foreignKey: 'userId',
+      as: 'posts',
+      onDelete: 'CASCADE',
+    });
+
+    User.hasMany(models.Comment, {
+      foreignKey: 'userId',
+      as: 'comments',
+      onDelete: 'CASCADE',
+    });
+  };
+  return User;
+};
+
+Rediger post til dette:
+
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  const Post = sequelize.define('Post', {
+    title: DataTypes.STRING,
+    content: DataTypes.TEXT,
+    userId: DataTypes.INTEGER
+  }, {});
+  Post.associate = function(models) {
+    // associations can be defined here
+    Post.hasMany(models.Comment, {
+      foreignKey: 'postId',
+      as: 'comments',
+      onDelete: 'CASCADE',
+    });
+
+    Post.belongsTo(models.User, {
+      foreignKey: 'userId',
+      as: 'author',
+      onDelete: 'CASCADE',
+    })
+  };
+  return Post;
+};
+
+Comment til dette:
+
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  const Comment = sequelize.define('Comment', {
+    postId: DataTypes.INTEGER,
+    comment: DataTypes.TEXT,
+    userId: DataTypes.INTEGER
+  }, {});
+  Comment.associate = function(models) {
+    // associations can be defined here
+    Comment.belongsTo(models.User, {
+      foreignKey: 'userId',
+      as: 'author'
+    });
+    Comment.belongsTo(models.Post, {
+      foreignKey: 'postId',
+      as: 'post'
+    });
+  };
+  return Comment;
+};
+
+
+Nu kan vi kører vores migrations, som laver i dette tilfælde oprette tabeller
+
+npx sequelize db:migrate
+
+Hvis dette sker: ERROR: Invalid shorthand property initializer så har du måske skrevet = ok ikke :

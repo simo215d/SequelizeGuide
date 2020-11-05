@@ -1,4 +1,5 @@
 # Guide
+# Del 1. Opsæt database med sequelize
 Tutorial: https://dev.to/nedsoft/getting-started-with-sequelize-and-postgres-emp
 
 npm install sequelize sequelize-cli
@@ -259,3 +260,99 @@ npx sequelize db:seed:all
 
 
 Og nu er der data i databasen!
+
+
+# Del 2. Opsæt server med node web
+https://dev.to/nedsoft/performing-crud-with-sequelize-29cf
+
+lav en express app i roden.
+
+express --hbs
+
+npm install
+
+Så lav en mappe til at håndtere CRUD vi kalder den controllers. Her dirigere vores router til.
+
+mkdir controllers && touch controllers/index.js
+
+
+Put det her i controllers/index.js:
+
+const models = require('../database/models');
+
+const createPost = async (req, res) => {
+  try {
+    const post = await models.Post.create(req.body);
+    return res.status(201).json({
+      post,
+    });
+  } catch (error) {
+    return res.status(500).json({error: error.message})
+  }
+}
+
+module.exports = {
+  createPost,
+}
+
+
+Rediger nu din router fil, så den har dette: 
+
+const { Router } = require('express');
+const controllers = require('../controllers');
+
+const router = Router();
+
+router.get('/', (req, res) => res.send('Welcome'))
+
+router.post('/posts', controllers.createPost);
+
+module.exports = router;
+
+
+
+Åbn postman og lav en postrequest til: localhost:3000/posts med dette body:
+
+{
+    "userId": 1,
+    "title": "postman hello",
+    "content": "bro!"
+}
+
+Du bør så få en response og der bør ligge noget nyt i databasen.
+
+
+Nu laver vi getter
+
+tilføj dette til controller/index.js:
+
+const getAllPosts = async (req, res) => {
+    try {
+      const posts = await models.Post.findAll({
+        include: [
+          {
+            model: models.Comment,
+            as: 'comments'
+          },
+          {
+            model: models.User,
+            as: 'author'
+          }
+        ]
+      });
+      return res.status(200).json({ posts });
+    } catch (error) {
+      return res.status(500).send(error.message);
+    }
+  }
+
+module.exports = {
+  createPost,getAllPosts
+}
+
+Og dette til routeren:
+
+router.get('/posts', controllers.getAllPosts);
+
+
+Hvis du vil lave resten, så se under del2 afsnittet. der ligger mere CRUD!

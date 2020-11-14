@@ -22,7 +22,7 @@ module.exports = {
 
 btw .sequelizerc skal ikke være .js den skal bare lades være udefineret er ok
 
-lav en holder der hedder database
+lav en folder der hedder database (faktisk så laver den selv database folderen når næste kommando køres)
 
 npx sequelize init
 

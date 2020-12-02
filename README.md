@@ -6,6 +6,8 @@ Tutorial: https://dev.to/nedsoft/getting-started-with-sequelize-and-postgres-emp
 
 npm install sequelize sequelize-cli
 
+Man behøver ikke touch. Man kan bare køre npx sequelize init og så gør den bare default settings. Så kan man bare tilpasse det senere
+
 touch .sequelizerc
 
 Indsæt dette i .sequelizerc
